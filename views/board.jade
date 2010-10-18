@@ -7,7 +7,8 @@ html
     script(src="http://code.jquery.com/jquery-1.4.2.min.js")
     script(src="/js/json2.js")
     :javascript
-      | io.setPath('http://cdn.socket.io/stable/')
+      | io.setPath('http://cdn.socket.io/stable/');
+      | ROOM_ID = #{room_id};
     script(src="/js/board.js")
     :javascript
       | $(function() {

@@ -7,7 +7,8 @@ if (!console) {
 }
 
 $(function(){    
-    var client = new SocketClient();
+    
+    var client = new SocketClient(ROOM_ID);
     var drawing = new Drawing();
     
     // Send new received shapes to drawing
@@ -57,7 +58,8 @@ $(function(){
     });
 });
 
-SocketClient = function() {
+SocketClient = function(room_id) {
+    this.room_id = room_id;
     var self = this;
 	this.socket = new io.Socket('localhost');
 	
@@ -65,7 +67,7 @@ SocketClient = function() {
 	this.socket.on('connect', function() {
 	    self.send({
 	       'kind':'init',
-	       'room_id':2 
+	       'room_id':self.room_id
 	    });
 	});
 	

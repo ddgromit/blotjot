@@ -10,11 +10,14 @@ var room = require('./room');
 var app = express.createServer(
     connect.staticProvider(__dirname + "/public")
 ); 
-app.get('/', function(req, res){ 
+app.get('/', function( req, res) {
+    res.redirect('/' + Math.floor(Math.random() * 10000));
+});
+app.get('/:room_id', function(req, res){ 
     res.render('board.jade', {
         layout: false,
         locals: {
-            
+            'room_id':req.params.room_id
         }
     });
 }); 
