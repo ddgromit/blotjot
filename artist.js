@@ -5,19 +5,13 @@ Artist = function(client, room) {
     
     this.room.on("newShapes", self._newRemoteShapes.bind(this));
     this.client.on('connect', self._connect.bind(this));
-    this.client.on('message', self._data.bind(this));
+    this.client.on('jsonmessage', self._data.bind(this));
 };
 Artist.prototype = {
     '_connect':function() {
         
     },
-    '_data': function(data_str) {
-        try {
-            var data = JSON.parse(data_str);
-        } catch (e) {
-            console.log("Couldn't parse JSON: " + data_str);
-            return;
-        }
+    '_data': function(data) {
         if (!('kind' in data)) {
             console.log('Received data without kind: ' + data_str);
             return;
@@ -36,11 +30,15 @@ Artist.prototype = {
     },
     '_newRemoteShapes':function(client, shapes) {
         if (client != this.client) {
-            this.client.send(JSON.stringify({
+            this._sendJSON({
                 'kind':'shapes',
                 'shapes':shapes
-            }));
+            });
         }
+    },
+    '_sendJSON':function(obj) {
+        this.send(JSON.stringify(obj));
+        return this;
     }
     
 };
