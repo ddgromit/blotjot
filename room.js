@@ -1,5 +1,6 @@
 var sys = require('sys');
 var events = require('events');
+var _ = require('underscore')._;
 var mongodb = require("mongodb"),
     Db = mongodb.Db,
     Server = mongodb.Server;
@@ -15,7 +16,11 @@ dbclient.open(function() {});
 // A room
 Room = function(room_id) {
     this.room_id = room_id;
+    this.clients = {};
     events.EventEmitter.call(this);
+    this.on('clientsChanged', function(num) {
+        console.log('changed some clients: ' + num);
+    });
 }
 sys.inherits(Room, events.EventEmitter);
 
@@ -60,6 +65,21 @@ Room.prototype.getAllShapes = function(callback) {
         });
     });
 }
+Room.prototype.addClient = function(client) {
+    var id = client.sessionId;
+    if (!(id in this.clients)) {    
+        this.clients[id] = {};
+        this.emit("clientsChanged", _.keys(this.clients).length);   
+        //console.log(sys.inspect(client));
+    }
+    
+    var self = this;
+    client.on('disconnect', function() {
+        delete self.clients[id];
+        self.emit("clientsChanged", _.keys(self.clients).length);
+    });
+}
+
 exports.Room = Room;
 
 
@@ -69,6 +89,7 @@ var rooms = {};
 var getRoom = function(room_id) {
     if (!(room_id in rooms)) {
         rooms[room_id] = new Room(room_id);
+        console.log('Made a new room : ' + room_id);
     } 
     
     return rooms[room_id];

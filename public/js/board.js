@@ -108,6 +108,9 @@ SocketClient.prototype = {
         	    $(this).triggerHandler('connected');
             }
         }
+        if (message.kind == 'clientsChanged') {
+            console.log('New client numbers: ' + message.num_clients);
+        }
     },
     'onLocalShapes':function(shapes) {
         this.send({

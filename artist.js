@@ -5,6 +5,9 @@ Artist = function(client, room) {
     this.room.on("newShapes", this._newRemoteShapes.bind(this));
     this.client.on('jsonmessage', this._data.bind(this));
     this._connect();
+
+    this.room.addClient(this.client);
+    this.room.on("clientsChanged", this._clientsChanged.bind(this));
 };
 Artist.prototype = {
     '_connect':function() {
@@ -44,6 +47,12 @@ Artist.prototype = {
                 'shapes':shapes
             });
         }
+    },
+    '_clientsChanged':function(num_clients) {
+        this._sendJSON({
+            'kind':'clientsChanged',
+            'num_clients':num_clients
+        });
     },
     '_sendJSON':function(obj) {
         this.client.send(JSON.stringify(obj));
