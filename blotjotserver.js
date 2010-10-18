@@ -38,9 +38,9 @@ socket.on('connection', function(client){
     client.on('jsonmessage', function preInit(message) {
         // Wait for init and only execute once
         if (message.kind == 'init') {
-            new Artist(client, room.getRoom(message.room_id));
             this.removeListener('jsonmessage',preInit);
             this.send(JSON.stringify({'kind':'initResponse','ready':true}));
+            new Artist(client, room.getRoom(message.room_id));
         }
     }); 
 });

@@ -23,33 +23,37 @@ $(function(){
     });
     
     // Test receiving shapes
-    var message1 = {
-        'kind':'shapes',
-        'shapes':[
-        {
-            'type':'bezier',
-            'points':[[1,2],[3,4]]
-        },    
-        {
-            'type':'bezier',
-            'points':[[4,5],[2,1]]
-        }]
-    };
-    client.onMessage(message1);
-    
-    // Test drawing shapes
-    $(client).bind('connected', function() {
-        var shapesDrawn = [
+    window.testReceiveShapes = function() {
+        var message1 = {
+            'kind':'shapes',
+            'shapes':[
             {
                 'type':'bezier',
-                'points':[[33,31],[40,42]]
+                'points':[[1,2],[3,4]]
             },    
             {
                 'type':'bezier',
-                'points':[[50,51],[52,53]]
-            }
-        ];
-        drawing.onDraw(shapesDrawn);
+                'points':[[4,5],[2,1]]
+            }]
+        };
+        client.onMessage(message1);
+    }
+    
+    // Test drawing shapes
+    $(client).bind('connected', function() {
+        window.testSendShapes = function() {
+            var shapesDrawn = [
+                {
+                    'type':'bezier',
+                    'points':[[33,31],[40,42]]
+                },    
+                {
+                    'type':'bezier',
+                    'points':[[50,51],[52,53]]
+                }
+            ];
+            drawing.onDraw(shapesDrawn);
+        }
     });
 });
 
@@ -61,7 +65,7 @@ SocketClient = function() {
 	this.socket.on('connect', function() {
 	    self.send({
 	       'kind':'init',
-	       'room_id':1 
+	       'room_id':2 
 	    });
 	});
 	

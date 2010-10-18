@@ -1,15 +1,24 @@
 Artist = function(client, room) {
-    var self = this;
     this.client = client;
     this.room = room;
     
-    this.room.on("newShapes", self._newRemoteShapes.bind(this));
-    this.client.on('connect', self._connect.bind(this));
-    this.client.on('jsonmessage', self._data.bind(this));
+    this.room.on("newShapes", this._newRemoteShapes.bind(this));
+    this.client.on('jsonmessage', this._data.bind(this));
+    this._connect();
 };
 Artist.prototype = {
     '_connect':function() {
-        
+        // Get and send shapes already on the board
+        var self = this;
+        this.room.getAllShapes(function(docs) {
+            var shapes = [];
+            docs.forEach(function(doc) {
+                doc.shapes.forEach(function(shape) {
+                    shapes.push(shape);
+                });
+            });
+            self._newRemoteShapes(null, shapes);
+        });
     },
     '_data': function(data) {
         if (!('kind' in data)) {
@@ -37,7 +46,7 @@ Artist.prototype = {
         }
     },
     '_sendJSON':function(obj) {
-        this.send(JSON.stringify(obj));
+        this.client.send(JSON.stringify(obj));
         return this;
     }
     

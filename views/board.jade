@@ -9,5 +9,13 @@ html
     :javascript
       | io.setPath('http://cdn.socket.io/stable/')
     script(src="/js/board.js")
+    :javascript
+      | $(function() {
+      |   $(".test-send").click(function() { window.testSendShapes(); });
+      |   $(".test-receive").click(function() { window.testReceiveShapes(); });
+      | });
   body
     h2.title Whiteboard
+    div.test-buttons
+      button.test-send Test Send
+      button.test-receive Test Receive
