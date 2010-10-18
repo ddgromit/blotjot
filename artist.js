@@ -31,13 +31,16 @@ Artist.prototype = {
         }
     },
     '_newLocalShapes':function(shapes) {
+        console.log('Received ' + shapes.length + ' local shapes.');
         this.room.addNewShapes(this.client, shapes);
     },
     '_newRemoteShapes':function(client, shapes) {
-        this.client.send(JSON.stringify({
-            'kind':'shapes',
-            'shapes':shapes
-        }));
+        if (client != this.client) {
+            this.client.send(JSON.stringify({
+                'kind':'shapes',
+                'shapes':shapes
+            }));
+        }
     }
     
 };

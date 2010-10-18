@@ -12,10 +12,12 @@ $(function(){
     
     // Send new received shapes to drawing
     $(client).bind("newRemoteShapes", function(e, shapes) { 
+        console.log("New remote shapes:");
         console.log(shapes);
         drawing.onRemoteShapes(shapes);
     });
     $(drawing).bind("newLocalShapes", function(e, shapes) {
+        console.log("New local shapes: ");
         console.log(shapes);
         client.onLocalShapes(shapes);
     });
@@ -54,9 +56,16 @@ $(function(){
 SocketClient = function() {
     var self = this;
 	this.socket = new io.Socket('localhost');
+	
+	// Init the room on connect
 	this.socket.on('connect', function() {
-	    $(self).triggerHandler('connected');
+	    self.send({
+	       'kind':'init',
+	       'room_id':1 
+	    });
 	});
+	
+	// Parse JSON messages
     this.socket.on("message", function(data_str) {
         try {
             var parsed = $.parseJSON(data_str);
@@ -68,9 +77,6 @@ SocketClient = function() {
     });
     
 	this.socket.connect();
-	this.socket.on('connect', function() {
-	    
-	});
 };
 SocketClient.prototype = {
     /* Passed the incoming data as a JSON object */
@@ -90,9 +96,14 @@ SocketClient.prototype = {
                 
             $(this).triggerHandler("newRemoteShapes", [message.shapes]);
         }
+        
+        if (message.kind == 'initResponse') {
+            if (message.ready) {
+        	    $(this).triggerHandler('connected');
+            }
+        }
     },
     'onLocalShapes':function(shapes) {
-        console.log(shapes);
         this.send({
             'kind':'shapes',
             'shapes':shapes
@@ -108,7 +119,7 @@ Drawing = function() {
 }
 Drawing.prototype = {
     'onRemoteShapes':function(shapes) {
-        console.log(shapes);
+        
     },
     'onDraw':function(shapes) {
         $(this).triggerHandler("newLocalShapes", [shapes]);

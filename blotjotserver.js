@@ -5,7 +5,7 @@ var express = require('express');
 var connect = require('connect');
 
 var Artist = require('./artist').Artist;
-var Room = require('./room').Room;
+var room = require('./room');
 
 var app = express.createServer(
     connect.staticProvider(__dirname + "/public")
@@ -18,27 +18,24 @@ app.get('/', function(req, res){
         }
     });
 }); 
-
-
 app.listen(3000);
 
-var oneRoom = new Room();
-var getRoom = function() {
-    return oneRoom;
-};
 
 var io = require('socket.io'); 
 var socket = io.listen(app); 
 socket.on('connection', function(client){ 
-    console.log('connected');
-    var a = new Artist(client, getRoom());
-    
-    client.on('message', function(data) {
+    client.on('message', function preInit(data) {
+        // Parse message
         console.log('message: ' + data);
+        message = JSON.parse(data);
+        
+        // Wait for init and only execute once
+        if (message.kind == 'init') {
+            new Artist(client, room.getRoom(message.room_id));
+            this.removeListener('message',preInit);
+            this.send(JSON.stringify({'kind':'initResponse','ready':true}));
+        }
     }); 
-    client.on('disconnect', function() {
-        console.log('disconnect');
-    });
 });
 
 
