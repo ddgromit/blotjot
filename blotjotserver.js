@@ -14,7 +14,7 @@ app.get('/', function( req, res) {
     res.redirect('/' + Math.floor(Math.random() * 10000));
 });
 app.get('/:room_id', function(req, res){ 
-    res.render('board.jade', {
+    res.render('board-test.jade', {
         layout: false,
         locals: {
             'room_id':req.params.room_id
