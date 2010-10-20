@@ -1,28 +1,5 @@
 whiteboard = {};
 
-whiteboard.ShapeCode = {
-    QUADBEZIER:3,
-    CLEAR:4
-};
-
-
-
-/* TYPES
-
-JSON
-{
-    'type':'bezier',
-    'color':'#CDCDCD',
-    'pts':[1,1,3,3,4,4]
-}
-
-INTERNAL
-{
-    'type':'bezier',
-    'color':'#CDCDCD',
-    'pts':[{'left':1,'top':1}]
-}
-*/
 whiteboard.ShapeFromJSONObject = function(obj) {
     if (obj.type == 'bezier') {
         var pts = [];
@@ -40,14 +17,14 @@ whiteboard.ShapeFromJSONObject = function(obj) {
 
 whiteboard.Clear = function(color) {
     this.color = color;
-    this.shape_type = whiteboard.ShapeCode.CLEAR;
+    this.type = 'clear';
 };
 whiteboard.Clear.prototype = {
     toJSONObject:function() {
-        return [
-            this.shape_type,
-            this.color
-        ];
+        return {
+            'type':'clear',
+            'color':this.color
+        };
     }
 };
 
@@ -55,7 +32,7 @@ whiteboard.QuadBezier = function(color, width, points) {
     this.color = color;
     this.width = width;
     this.points = points;
-    this.shape_type = whiteboard.ShapeCode.QUADBEZIER;
+    this.type = 'bezier';
 };
 whiteboard.QuadBezier.prototype = {
     'toJSONObject':function() {
@@ -88,10 +65,6 @@ Drawing = function() {
 };
 
 Drawing.prototype = {
-    ShapeCode:{
-        'POINT':1,
-        'LINE':2
-    },
     init:function(canvas,hasTouch,board_type) {
         // Vars
         this.$canvas = canvas;
@@ -181,9 +154,9 @@ Drawing.prototype = {
 		console.log("Received " + shapes.length + " shapes.");
         for (var i = 0; i < shapes.length;i++) {
             var shape = shapes[i];
-            if (shape.shape_type == whiteboard.ShapeCode.QUADBEZIER) {
+            if (shape.type == 'bezier') {
                 this.drawQuadBezier(shape);
-            } else if (shape.shape_type == whiteboard.ShapeCode.CLEAR) {
+            } else if (shape.shape_type == 'clear') {
                 this.drawClear(shape);
             }
         }
