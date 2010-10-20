@@ -9,23 +9,32 @@ whiteboard.ShapeCode = {
 
 /* TYPES
 
+JSON
+{
+    'type':'bezier',
+    'color':'#CDCDCD',
+    'pts':[1,1,3,3,4,4]
+}
+
+INTERNAL
+{
+    'type':'bezier',
+    'color':'#CDCDCD',
+    'pts':[{'left':1,'top':1}]
+}
 */
 whiteboard.ShapeFromJSONObject = function(obj) {
     if (obj.type == 'bezier') {
-        
-    }
-    if (obj[0] == whiteboard.ShapeCode.QUADBEZIER) {
-        var xys = obj[3];
         var pts = [];
-        for (var i = 0; i < xys.length; i = i + 2) {
-            pts.push({'left':xys[i],'top':xys[i+1]});
+        for (var i = 0; i < obj.pts.length; i = i + 2) {
+            pts.push({'left':obj.pts[i],'top':obj.pts[i+1]});
         }
-        return new whiteboard.QuadBezier(obj[1],obj[2],pts);
-    } else if (obj[0] == whiteboard.ShapeCode.CLEAR) {
-        return new whiteboard.Clear(obj[1]);
+        return new whiteboard.QuadBezier(obj.color, obj.width, pts);
+    } else if (obj.type == 'clear') {
+        return new whiteboard.Clear(obj.color);
     }
     
-    throw Error("Shape obj not recognized: " + obj[0]);
+    throw Error("Shape obj not recognized: " + obj.type);
 }
 
 
@@ -56,11 +65,10 @@ whiteboard.QuadBezier.prototype = {
             xys.push(parseInt(this.points[i].top));
         }
         return {
-            'kind':'shape',
-            'shape':whiteboard.ShapeCode.QUADBEZIER,
+            'type':'bezier',
             'color':this.color,
             'width':this.width,
-            'xys':xys
+            'pts':xys
         };
     },
 };
@@ -164,20 +172,16 @@ Drawing.prototype = {
         console.log('[drawing] Remote shapes: ');
         console.log(shapes);
         var drawingShapes = [];
-        $.each(shapes, function(i,shape) {        
-            console.log(shape);
-            //drawingShapes.push(whiteboard.ShapeFromJSONObject(shape));
+        $.each(shapes, function(i,shape) {   
+            drawingShapes.push(whiteboard.ShapeFromJSONObject(shape));
         });
+        this.onNewShapes(drawingShapes);
     },
     onNewShapes:function(shapes) {
 		console.log("Received " + shapes.length + " shapes.");
         for (var i = 0; i < shapes.length;i++) {
             var shape = shapes[i];
-            if (shape.shape_type == whiteboard.ShapeCode.POINT) {
-                this.drawPoint(shape);
-            } else if (shape.shape_type == whiteboard.ShapeCode.LINE) {
-                this.drawLine(shape);     
-            } else if (shape.shape_type == whiteboard.ShapeCode.QUADBEZIER) {
+            if (shape.shape_type == whiteboard.ShapeCode.QUADBEZIER) {
                 this.drawQuadBezier(shape);
             } else if (shape.shape_type == whiteboard.ShapeCode.CLEAR) {
                 this.drawClear(shape);
@@ -480,7 +484,7 @@ Drawing.prototype = {
 
         // Trigger 'newLocalShapes' with just the JSON object 
         // representations of the shapes
-        $(this).triggerHandler("newLocalShapes",shape_json_objs);
+        $(this).triggerHandler("newLocalShapes",[shape_json_objs]);
     }
     
 };

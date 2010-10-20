@@ -1,3 +1,6 @@
+var _ = require('underscore')._;
+var sys = require('sys');
+
 Artist = function(client, room) {
     this.client = client;
     this.room = room;
@@ -37,6 +40,9 @@ Artist.prototype = {
         }
     },
     '_newLocalShapes':function(shapes) {
+        if (!validateShapes(shapes)) {
+            console.log('Invalid shapes: ' + sys.inspect(shapes));
+        }
         console.log('Received ' + shapes.length + ' local shapes.');
         this.room.addNewShapes(this.client, shapes);
     },
@@ -60,4 +66,39 @@ Artist.prototype = {
     }
     
 };
+
+function validateShapes(shapes) {
+    try {
+        shapes.forEach(function(shape) {
+            if (!('type' in shape)) {
+                throw Exception();
+            }
+            if (shape.type == 'bezier') {
+                if (!('color' in shape)) {
+                    throw Exception();
+                }
+                if (!('width' in shape)) {
+                    throw Exception();
+                }
+                if (!('pts' in shape)) {
+                    throw Exception();
+                }
+                shape.pts.forEach(function(dim) {
+                    if (!(typeof(dim) == "number")) {
+                        throw Exception();
+                    }
+                });
+                return;
+            } else if (shape.type == 'clear') {
+                if (!('color' in shape)) {
+                    throw Exception();
+                }
+                return;
+            }
+        });
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
 exports.Artist = Artist;
