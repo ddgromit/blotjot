@@ -1,19 +1,13 @@
 html
   head
-    :javascript
-      | WEB_SOCKET_SWF_LOCATION = '/swf/WebSocketMainInsecure.swf';
     script(src="http://cdn.socket.io/stable/socket.io.js")
     script(src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js")
     script(src="/js/json2.js")
     :javascript
-      | io.setPath('http://cdn.socket.io/stable/');
       | ROOM_ID = #{room_id};
     script(src="/js/socketclient.js")
     script(src="/js/drawing.js")
     link(href="/css/board.css", rel="stylesheet", type="text/css")
-    :javascript
-      | $(function() {
-      | });
   body
     div.canvas-container
       canvas#whiteboard(width="318",height="414") Your browser doesn't support canvas.  Please download chrome or firefox.

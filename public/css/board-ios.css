@@ -1,0 +1,28 @@
+html, body {
+    margin:0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+}
+.ipad #whiteboard {
+    width: 766px;
+    height: 944px;
+}
+#whiteboard {
+    border: 1px solid #ccc;
+    width: 318px;
+    height: 414px;
+    -webkit-transition: all 0.25s ease-out;
+}
+.error {
+    text-align: center;
+    font-family: Helvetica, Arial, Times;
+}
+.error .message {
+    font-size: 20px;
+    margin: 10px 0 20px 0;
+}
+.error .action {
+    font-size: 16px;
+}
+

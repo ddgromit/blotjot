@@ -1,20 +1,16 @@
 html
   head
     title blotjot board
-    :javascript
-      | WEB_SOCKET_SWF_LOCATION = '/swf/WebSocketMainInsecure.swf';
+    - var viewport_content = "user-scalable=no,initial-scale=1,minimum-scale=1,maximum-scale=1";
+    meta(name:"viewport", content:viewport_content)
     script(src="http://cdn.socket.io/stable/socket.io.js")
     script(src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js")
     script(src="/js/json2.js")
     :javascript
-      | io.setPath('http://cdn.socket.io/stable/');
       | ROOM_ID = #{room_id};
     script(src="/js/socketclient.js")
     script(src="/js/drawing.js")
-    link(href="/css/board-iso.css", rel="stylesheet", type="text/css")
-    :javascript
-      | $(function() {
-      | });
+    link(href="/css/board-ios.css", rel="stylesheet", type="text/css")
   body(class=board_type)
     - var board_width = board_type == 'ipad' ? 766 : 318;
     - var board_height = board_type == 'ipad' ? 944 : 414;

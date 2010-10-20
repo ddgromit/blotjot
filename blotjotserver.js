@@ -17,9 +17,6 @@ function agentType(agent) {
     if (agent.indexOf("ipad") >= 0) return "ipad";
     return "browser";
 }
-app.get('/', function( req, res) {
-    res.redirect('/' + Math.floor(Math.random() * 10000));
-});
 function renderIOS(req,res) {    
     var board_type = agentType(req.headers['user-agent']);
     res.render('board-ios.jade', {
@@ -30,6 +27,11 @@ function renderIOS(req,res) {
         }
     });
 }
+
+// HTTP Handlers
+app.get('/', function( req, res) {
+    res.redirect('/' + Math.floor(Math.random() * 10000));
+});
 app.get('/:room_id', function(req, res){ 
     var board_type = agentType(req.headers['user-agent']);
     console.log(board_type);
@@ -56,11 +58,14 @@ app.get('/:room_id/test', function(req, res){
         }
     });
 }); 
+
 app.listen(3000);
 
-
+// Socket.IO API Handlers
 var io = require('socket.io');
-var socket = io.listen(app); 
+var socket = io.listen(app, {
+        'transports':['websocket', 'server-events', 'htmlfile', 'xhr-multipart', 'xhr-polling']
+}); 
 socket.on('connection', function(client){ 
     // Converts messages into JSON messages
     client.on('message', function (data) {

@@ -21,7 +21,11 @@ if (!console) {
 SocketClient = function(room_id) {
     this.room_id = room_id;
     var self = this;
-	this.socket = new io.Socket('localhost');
+    // Socket without flash
+    
+	this.socket = new io.Socket(location.hostname, {
+        'transports':['websocket', 'server-events', 'htmlfile', 'xhr-multipart', 'xhr-polling']
+    });
 	
 	// Init the room on connect
 	this.socket.on('connect', function() {
