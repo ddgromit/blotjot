@@ -1,0 +1,22 @@
+html
+  head
+    script(src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js")
+    link(href="/css/home.css", rel="stylesheet", type="text/css")
+  body
+    div.main
+      h1.header
+        BlotJot
+      h2.subheader
+        Draw together in real time across browsers and devices
+      div.steps
+        div.step
+          div.step-name Choose a board URL
+          div.step-value
+            span http://blotjot.com/
+            input(type="text", maxlength=20, size=20, name="value")
+        div.step
+          div.step-name Choose a board size
+          div.step-value
+            div.input(type="button", value="iPhone")
+            div.input(type="button", value="iPad")
+

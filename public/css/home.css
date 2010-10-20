@@ -1,0 +1,26 @@
+.main {
+    width: 315px;
+    margin: 0 4px;
+    font-family: Verdana, sans-serif;
+}
+.header {
+    font-size: 30px;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+}
+.subheader {
+    font-size: 14px;
+    color: #333;
+    text-align: center;
+}
+.steps {
+
+}
+.step {
+    margin-bottom: 20px;
+}
+.step-name {
+    font-size: 14px;
+}
+
