@@ -10,14 +10,16 @@ html
       | io.setPath('http://cdn.socket.io/stable/');
       | ROOM_ID = #{room_id};
     script(src="/js/socketclient.js")
-    script(src="/js/drawing-test.js")
+    script(src="/js/drawing.js")
     :javascript
       | $(function() {
-      |   $(".test-send").click(function() { window.testSendShapes(); });
-      |   $(".test-receive").click(function() { window.testReceiveShapes(); });
       | });
   body
-    h2.title Whiteboard
-    div.test-buttons
-      button.test-send Test Send
-      button.test-receive Test Receive
+    div.canvas-container
+      canvas#whiteboard(width="318",height="414") Your browser doesn't support canvas.  Please download chrome or firefox.
+      div.toolbox
+        div.tool
+          div.control
+            div.clients-connected
+      div#fb-root
+      

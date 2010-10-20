@@ -13,6 +13,7 @@ if (!console) {
    - "connecting" - Sending the initial request. 
    - "connected" - Handshake/init has finished, ready for shapes
    - "newRemoteShapes" (shapes)
+   - "clientsChanged" (num_clients)
 
   Public methods:
    - onLocalShapes (shapes)
@@ -72,6 +73,7 @@ SocketClient.prototype = {
         }
         if (message.kind == 'clientsChanged') {
             console.log('New client numbers: ' + message.num_clients);
+            $(this).triggerHandler("clientsChanged", message.num_clients);
         }
     },
     'onLocalShapes':function(shapes) {

@@ -1,0 +1,112 @@
+html, body {
+    margin:0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+}
+.ipad .canvas-container {
+    width: 930px;
+}
+.canvas-container {
+    width: 482px;
+    margin: 5px auto 10px auto;
+    padding: 20px;
+}
+
+/* Toolbox */
+.toolbox {
+    float: right;
+    width: 138px;
+    padding: 5px;
+    margin-left: 10px;
+    -webkit-box-shadow: 0px 0px 10px #888;
+    -moz-box-shadow: 3px 3px 10px #888;
+    border: 1px solid #ccc;
+}
+.toolbox input[type="text"] {
+    width: 60px;
+}
+
+/* Whiteboard */
+.ipad #whiteboard {
+    width: 766px;
+    height: 944px;
+}
+#whiteboard {
+    width: 318px;
+    height: 414px;
+    float: left;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    -webkit-box-shadow: 0px 0px 10px #888;
+    -moz-box-shadow: 3px 3px 10px #888;
+    -webkit-transition: all 0.25s ease-out;
+    -moz-transition: all 0.25s ease-out;
+}
+
+/* Toolbox Tools */
+#width_slider {
+    width: 80%;
+}
+#width_slider a {
+}
+
+.tool {
+    font-family: Arial, Sans;
+    margin-bottom: 20px;
+}
+.tool .name {
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+.tool .control {
+    
+}
+#colorpicker {
+    z-index:3;
+}
+.stroke-color {
+    width: 115px;
+    height: 20px;
+    border: 1px solid #bbb;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    cursor: pointer;
+}    
+    
+.stroke-color:hover {
+    bordeR: 1px solid #666;
+}
+
+.swatches {
+    
+}
+.swatch {
+    display: inline-block;
+    margin-right: 5px;
+    height: 20px;
+    width: 20px;
+    border: 1px solid #bbb;
+    cursor: pointer;
+}
+.swatch:hover {
+    bordeR: 1px solid #666;
+}
+
+.tool .clients-connected {
+    
+    font-size: 12px;
+}
+
+/* Error Page */
+.error {
+    text-align: center;
+    font-family: Helvetica, Arial, Times;
+}
+.error .message {
+    font-size: 20px;
+    margin: 10px 0 20px 0;
+}
+.error .action {
+    font-size: 16px;
+}
