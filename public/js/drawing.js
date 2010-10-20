@@ -1,25 +1,23 @@
-whiteboard = {};
-
-whiteboard.ShapeFromJSONObject = function(obj) {
+shapeFromJSONObject = function(obj) {
     if (obj.type == 'bezier') {
         var pts = [];
         for (var i = 0; i < obj.pts.length; i = i + 2) {
             pts.push({'left':obj.pts[i],'top':obj.pts[i+1]});
         }
-        return new whiteboard.QuadBezier(obj.color, obj.width, pts);
+        return new QuadBezier(obj.color, obj.width, pts);
     } else if (obj.type == 'clear') {
-        return new whiteboard.Clear(obj.color);
+        return new Clear(obj.color);
     }
     
     throw Error("Shape obj not recognized: " + obj.type);
 }
 
 
-whiteboard.Clear = function(color) {
+Clear = function(color) {
     this.color = color;
     this.type = 'clear';
 };
-whiteboard.Clear.prototype = {
+Clear.prototype = {
     toJSONObject:function() {
         return {
             'type':'clear',
@@ -28,13 +26,13 @@ whiteboard.Clear.prototype = {
     }
 };
 
-whiteboard.QuadBezier = function(color, width, points) {
+QuadBezier = function(color, width, points) {
     this.color = color;
     this.width = width;
     this.points = points;
     this.type = 'bezier';
 };
-whiteboard.QuadBezier.prototype = {
+QuadBezier.prototype = {
     'toJSONObject':function() {
         var xys = [];
         for (var i = 0; i < this.points.length; i++) {
@@ -146,7 +144,7 @@ Drawing.prototype = {
         console.log(shapes);
         var drawingShapes = [];
         $.each(shapes, function(i,shape) {   
-            drawingShapes.push(whiteboard.ShapeFromJSONObject(shape));
+            drawingShapes.push(shapeFromJSONObject(shape));
         });
         this.onNewShapes(drawingShapes);
     },
@@ -242,7 +240,7 @@ Drawing.prototype = {
                     context.quadraticCurveTo( quad.points[i].left, quad.points[i].top, quad.points[i+1].left, quad.points[i+1].top);
                 } else if (i <= quad.points.length - 1) {
                     // If there are two points left
-                    //var line = new whiteboard.Line(quad.color, quad.width, quad.points[i].left, quad.points[i].top, quad.points[i+1].left, quad.points[i+1].top);
+                    //var line = new Line(quad.color, quad.width, quad.points[i].left, quad.points[i].top, quad.points[i+1].left, quad.points[i+1].top);
                     //this.drawLine(line);
                     context.quadraticCurveTo( quad.points[i].left, quad.points[i].top, quad.points[i].left, quad.points[i].top);
                 }
@@ -363,12 +361,12 @@ Drawing.prototype = {
     },
     onPointMove:function(pos) {
         if (this.drawMode == "point") {
-            var point = new whiteboard.Point(this.strokeColor, this.shapeWidth, pos.left,pos.top);
+            var point = new Point(this.strokeColor, this.shapeWidth, pos.left,pos.top);
             this.drawPoint(point);
             this._addShapes([point]);
         } else if (this.drawMode == "line") {
             if (this.lastPoint != null) {
-                var line = new whiteboard.Line(this.strokeColor, this.shapeWidth, this.lastPoint.left,this.lastPoint.top,pos.left,pos.top);
+                var line = new Line(this.strokeColor, this.shapeWidth, this.lastPoint.left,this.lastPoint.top,pos.left,pos.top);
                 this.drawLine(line);
                 this._addShapes([line]);
             }
@@ -376,7 +374,7 @@ Drawing.prototype = {
             this.pointBuffer.push(pos);
 
             // Draw over last few shapes of the quad
-            var quad = new whiteboard.QuadBezier(this.strokeColor,this.shapeWidth, this.pointBuffer.slice(-8));
+            var quad = new QuadBezier(this.strokeColor,this.shapeWidth, this.pointBuffer.slice(-8));
             this.drawQuadBezier(quad);
 
         }
@@ -392,7 +390,7 @@ Drawing.prototype = {
         this.lastPoint = null;
         if (this.drawMode == 'bezier' && this.pointBuffer.length > 0)
         {
-            var quad = new whiteboard.QuadBezier(this.strokeColor,this.shapeWidth, this.pointBuffer);
+            var quad = new QuadBezier(this.strokeColor,this.shapeWidth, this.pointBuffer);
             this.drawQuadBezier(quad);
             this._addShapes([quad]);
         }
@@ -412,7 +410,7 @@ Drawing.prototype = {
 		var self = this;
 		var sendPartialBezier = function() {
 			if (self.drawMode == 'bezier') {
-				var quad = new whiteboard.QuadBezier(self.strokeColor,self.shapeWidth, self.pointBuffer);
+				var quad = new QuadBezier(self.strokeColor,self.shapeWidth, self.pointBuffer);
                 this._addShapes([quad]);
 				self.pointBuffer = [];
 				self.writeBezierAnywayTimeout = null;
@@ -445,7 +443,7 @@ Drawing.prototype = {
 		return this.shapeWidth;
     },
 	clear:function() {
-		var clear = new whiteboard.Clear("#ffffff");
+		var clear = new Clear("#ffffff");
 		this.drawClear(clear);
         this._addShapes([clear]);
 	},
