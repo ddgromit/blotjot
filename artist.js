@@ -25,6 +25,7 @@ Artist.prototype = {
             });
             self._newRemoteShapes(null, shapes);
         });
+        this._sendClients();
     },
     '_data': function(data) {
         if (!('kind' in data)) {
@@ -53,6 +54,12 @@ Artist.prototype = {
                 'shapes':shapes
             });
         }
+    },
+    '_sendClients':function(num_clients) {
+        this._sendJSON({
+            'kind':'clientsChanged',
+            'num_clients':this.room.numClients()
+        });
     },
     '_clientsChanged':function(num_clients) {
         this._sendJSON({

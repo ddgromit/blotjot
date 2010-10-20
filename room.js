@@ -64,19 +64,22 @@ Room.prototype.getAllShapes = function(callback) {
             });
         });
     });
-}
+};
+Room.prototype.numClients = function() {
+    return _.keys(this.clients).length;
+};
 Room.prototype.addClient = function(client) {
     var id = client.sessionId;
     if (!(id in this.clients)) {    
         this.clients[id] = {};
-        this.emit("clientsChanged", _.keys(this.clients).length);   
+        this.emit("clientsChanged", this.numClients());   
         //console.log(sys.inspect(client));
     }
     
     var self = this;
     client.on('disconnect', function() {
         delete self.clients[id];
-        self.emit("clientsChanged", _.keys(self.clients).length);
+        self.emit("clientsChanged", self.numClients());
     });
 }
 

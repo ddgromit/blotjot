@@ -486,11 +486,11 @@ $(function() {
     });
     $(client).bind("clientsChanged", function(e, num_clients) {
         console.log('[socket] New client numbers: ' + num_clients);
-        var message = "Drawing alone :(";
+        var message = "Drawing alone =(";
         if (num_clients == 2) {
-            var message = "Drawing with 1 other person";
+            var message = "Drawing with 1 other person =)";
         } else if (num_clients > 2) {
-            var message = "Drawing with " + (num_clients-1) + " others";
+            var message = "Drawing with " + (num_clients-1) + " others =D";
         }
         $(".clients-connected").text(message);
     });
