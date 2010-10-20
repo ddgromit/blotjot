@@ -1,16 +1,16 @@
 html
   head
-    link(href="/css/board.css", rel="stylesheet", type="text/css")
     :javascript
       | WEB_SOCKET_SWF_LOCATION = '/swf/WebSocketMainInsecure.swf';
     script(src="http://cdn.socket.io/stable/socket.io.js")
-    script(src="http://code.jquery.com/jquery-1.4.2.min.js")
+    script(src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js")
     script(src="/js/json2.js")
     :javascript
       | io.setPath('http://cdn.socket.io/stable/');
       | ROOM_ID = #{room_id};
     script(src="/js/socketclient.js")
     script(src="/js/drawing.js")
+    link(href="/css/board.css", rel="stylesheet", type="text/css")
     :javascript
       | $(function() {
       | });
@@ -18,6 +18,29 @@ html
     div.canvas-container
       canvas#whiteboard(width="318",height="414") Your browser doesn't support canvas.  Please download chrome or firefox.
       div.toolbox
+        div.tool
+          div.name Color
+          div.control
+            div.stroke-color
+            div.swatches
+              div.swatch
+              div.swatch
+              div.swatch
+              div.swatch
+              div.swatch
+              div.swatch
+              div.swatch
+              div.swatch
+        div.tool
+          div.name Width
+          div.control
+            div.width-opt.width-opt-thin thin
+            div.width-opt.width-opt-medium medium
+            div.width-opt.width-opt-thick thick
+        div.tool
+          div.name 
+          div.control
+            input(type="button",name="clear",value="Clear Pad")
         div.tool
           div.control
             div.clients-connected

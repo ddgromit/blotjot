@@ -10,16 +10,43 @@ var room = require('./room');
 var app = express.createServer(
     connect.staticProvider(__dirname + "/public")
 ); 
+function agentType(agent) {
+    var agent = agent.toLowerCase();
+    if (agent.indexOf("ipod") >= 0) return "ipod";
+    if (agent.indexOf("iphone") >= 0) return "iphone";
+    if (agent.indexOf("ipad") >= 0) return "ipad";
+    return "browser";
+}
 app.get('/', function( req, res) {
     res.redirect('/' + Math.floor(Math.random() * 10000));
 });
-app.get('/:room_id', function(req, res){ 
-    res.render('board-browser.jade', {
+function renderIOS(req,res) {    
+    var board_type = agentType(req.headers['user-agent']);
+    res.render('board-ios.jade', {
         layout: false,
         locals: {
-            'room_id':req.params.room_id
+            'room_id':req.params.room_id,
+            'board_type':board_type,
         }
     });
+}
+app.get('/:room_id', function(req, res){ 
+    var board_type = agentType(req.headers['user-agent']);
+    console.log(board_type);
+    console.log(req.headers['user-agent']);
+    if (board_type == 'browser') {
+        res.render('board-browser.jade', {
+            layout: false,
+            locals: {
+                'room_id':req.params.room_id
+            }
+        });
+    } else {
+        renderIOS(req,res);
+    }
+}); 
+app.get('/:room_id/ios', function(req, res){ 
+    renderIOS(req,res);
 }); 
 app.get('/:room_id/test', function(req, res){ 
     res.render('board-test.jade', {

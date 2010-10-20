@@ -75,7 +75,7 @@ html, body {
 }    
     
 .stroke-color:hover {
-    bordeR: 1px solid #666;
+    
 }
 
 .swatches {
@@ -83,9 +83,10 @@ html, body {
 }
 .swatch {
     display: inline-block;
-    margin-right: 5px;
-    height: 20px;
-    width: 20px;
+    margin-right: 4px;
+    margin-top: 4px;
+    height: 24px;
+    width: 24px;
     border: 1px solid #bbb;
     cursor: pointer;
 }
@@ -93,6 +94,21 @@ html, body {
     bordeR: 1px solid #666;
 }
 
+.width-opt {
+    display: inline-block;
+    border: 1px solid #bbb;
+    cursor: pointer;
+    font-size: 12px;
+    margin-right: 3px;
+    padding: 3px;
+    
+}
+.width-opt:hover {
+    border: 1px solid #666;
+}
+.width-opt.selected {
+    border: 1px solid #333;
+}
 .tool .clients-connected {
     
     font-size: 12px;

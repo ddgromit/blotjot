@@ -1,0 +1,22 @@
+html
+  head
+    title blotjot board
+    :javascript
+      | WEB_SOCKET_SWF_LOCATION = '/swf/WebSocketMainInsecure.swf';
+    script(src="http://cdn.socket.io/stable/socket.io.js")
+    script(src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js")
+    script(src="/js/json2.js")
+    :javascript
+      | io.setPath('http://cdn.socket.io/stable/');
+      | ROOM_ID = #{room_id};
+    script(src="/js/socketclient.js")
+    script(src="/js/drawing.js")
+    link(href="/css/board-iso.css", rel="stylesheet", type="text/css")
+    :javascript
+      | $(function() {
+      | });
+  body(class=board_type)
+    - var board_width = board_type == 'ipad' ? 766 : 318;
+    - var board_height = board_type == 'ipad' ? 944 : 414;
+    canvas#whiteboard(width=board_width,height=board_height) Your browser doesn't support canvas.
+    

@@ -154,7 +154,7 @@ Drawing.prototype = {
             var shape = shapes[i];
             if (shape.type == 'bezier') {
                 this.drawQuadBezier(shape);
-            } else if (shape.shape_type == 'clear') {
+            } else if (shape.type == 'clear') {
                 this.drawClear(shape);
             }
         }
@@ -503,24 +503,53 @@ $(function() {
     drawing.init($("#whiteboard"),is_iphone, board_type);
 
 
-    // Color
+    // Stroke
     var currentColor = "#222222";
     function setStrokeColor(color,ignoreColorPicker) {
         drawing.setStrokeColor(color);
         $(".stroke-color").css('background-color',color);
         currentColor = color;
-
-        if (ignoreColorPicker || true) {
-            //$("#colorpicker").ColorPickerSetColor(color);
-        }
     }
     setStrokeColor(currentColor);
 
 
+    // Swatches
+    swatch_colors = ['#FF4848','#3923D6','#9A03FE','#fff','#23819C','#1FCB4A','#DFDF00','#000'];
+    var selectedIndex = Math.floor(Math.random()*swatch_colors.length)
+    $(".swatch").each(function(i,elem) {
+        var color = swatch_colors[i];
+        $(elem).data('color',color);
+        $(elem).css('background-color',color);
+        if (i == selectedIndex && color != '#fff') {
+            setStrokeColor(color);
+        }
+    });
+    $(".swatch").click(function() {
+        setStrokeColor($(this).data('color'));
+    });
+
+    // Clear button
     $("input[name='clear']").click(function() {
         drawing.clear();
     });
     
+    // Width
+    $(".width-opt-thin").click(function() {
+        drawing.setShapeWidth(1);
+        $(".width-opt").removeClass("selected");
+        $(this).addClass("selected");
+    });
+    $(".width-opt-medium").click(function() {
+        drawing.setShapeWidth(3);
+        $(".width-opt").removeClass("selected");
+        $(this).addClass("selected");
+    });
+    $(".width-opt-thick").click(function() {
+        drawing.setShapeWidth(8);
+        $(".width-opt").removeClass("selected");
+        $(this).addClass("selected");
+    });
+
     // Prevent selection
     $("body").bind("selectstart",function() {
         return false;
