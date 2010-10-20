@@ -485,12 +485,12 @@ $(function() {
         console.log('[socket] Connected.');
     });
     $(client).bind("clientsChanged", function(e, num_clients) {
-        console.log('[socket] New client numbers: ' + message.num_clients);
-        var message = "Collaborating with 0 others";
-        if (num_clients == 1) {
-            var message = "Collaborating with 1 other person";
-        } else if (num_clients > 1) {
-            var message = "Collaborating with " + num_clients + " others";
+        console.log('[socket] New client numbers: ' + num_clients);
+        var message = "Drawing alone :(";
+        if (num_clients == 2) {
+            var message = "Drawing with 1 other person";
+        } else if (num_clients > 2) {
+            var message = "Drawing with " + (num_clients-1) + " others";
         }
         $(".clients-connected").text(message);
     });
