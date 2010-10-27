@@ -4,7 +4,7 @@ var sys = require('sys');
 Artist = function(client, room) {
     this.client = client;
     this.room = room;
-    
+
     this.room.on("newShapes", this._newRemoteShapes.bind(this));
     this.client.on('jsonmessage', this._data.bind(this));
     this._connect();
@@ -43,6 +43,7 @@ Artist.prototype = {
     '_newLocalShapes':function(shapes) {
         if (!validateShapes(shapes)) {
             console.log('Invalid shapes: ' + sys.inspect(shapes));
+            return;
         }
         console.log('Received ' + shapes.length + ' local shapes.');
         this.room.addNewShapes(this.client, shapes);
@@ -71,7 +72,7 @@ Artist.prototype = {
         this.client.send(JSON.stringify(obj));
         return this;
     }
-    
+
 };
 
 function validateShapes(shapes) {
@@ -109,3 +110,4 @@ function validateShapes(shapes) {
     }
 }
 exports.Artist = Artist;
+
