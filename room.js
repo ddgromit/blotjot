@@ -88,15 +88,59 @@ exports.Room = Room;
 
 
 
-// A room manager
+/*
+    A manager for currently used room objects.  A room may exist in the DB but not
+    in the cached list here.
+*/
 var rooms = {};
-var getRoom = function(room_id) {
+var getRoom = function(room_id, callback) {
     if (!(room_id in rooms)) {
-        rooms[room_id] = new Room(room_id);
-        console.log('Made a new room : ' + room_id);
-    }
+        dbclient.collection(ROOMS_COLL_NAME, function(err,collection) {
+            collection.findOne({'room_id':room_id},function(err,doc) {
+                if (err || !doc) {
+                    callback(false);
+                } else {
+                    if (!(room_id in rooms)) {
+                        rooms[room_id] = new Room(doc['room_id'],doc['type']);
+                        callback(rooms[room_id]);
+                        console.log('Made a new room : ' + room_id);
+                    }
+                }
+            });
+        });
 
-    return rooms[room_id];
+    } else {
+        callback(rooms[room_id]);
+    }
 };
+
+/*
+    Creates a room and returns true if sucessful or false if
+    there was an error or the room already exists.
+*/
+var createRoom = function(room_id,type, callback) {
+    dbclient.collection(ROOMS_COLL_NAME, function(err,collection) {
+        collection.count({'room_id':room_id},function(err,count) {
+            if (err || count > 0) {
+                callback(null);
+                return;
+            } else {
+                var doc = {
+                    'room_id':room_id,
+                    'type':type
+                };
+                collection.insert(doc, function(err, docs) {
+                    if (err) {
+                        console.log("DB insert error: " + err + " for doc " + sys.inspect(doc));
+                        callback(false);
+                        return;
+                    }
+                    callback(true);
+                });
+            }
+        });
+    });
+}
 exports.getRoom = getRoom;
+exports.createRoom = createRoom;
 

@@ -50,22 +50,36 @@ app.get('/create', function( req, res) {
         throw Error("Room ID must be only letters and numbers");
     }
 
-    res.redirect('/' + room_id);
+    // Try to create the room
+    room.createRoom(room_id,type, function(success) {
+        if (success) {
+            res.redirect('/' + room_id);
+        } else {
+            throw Error("Room already exists");
+        }
+    });
+
 });
 app.get('/:room_id', function(req, res){
-    var board_type = agentType(req.headers['user-agent']);
-    console.log(board_type);
-    console.log(req.headers['user-agent']);
-    if (board_type == 'browser') {
-        res.render('board-browser.jade', {
-            layout: false,
-            locals: {
-                'room_id':req.params.room_id
+    room.getRoom(req.params.room_id, function(room) {
+        if (room) {
+            var board_type = agentType(req.headers['user-agent']);
+            console.log(board_type);
+            console.log(req.headers['user-agent']);
+            if (board_type == 'browser') {
+                res.render('board-browser.jade', {
+                    layout: false,
+                    locals: {
+                        'room_id':req.params.room_id
+                    }
+                });
+            } else {
+                renderIOS(req,res);
             }
-        });
-    } else {
-        renderIOS(req,res);
-    }
+        } else {
+            res.send("Room not found",404);
+        }
+    });
 });
 app.get('/:room_id/ios', function(req, res){
     renderIOS(req,res);
@@ -91,10 +105,11 @@ socket.on('connection', function(client){
     client.on('message', function (data) {
         try {
             var data_obj = JSON.parse(data);
-            this.emit("jsonmessage", data_obj);
         } catch (e) {
             console.log("Couldn't parse JSON message: " + data + e);
+            return;
         }
+        this.emit("jsonmessage", data_obj);
     });
 
     // One-time-per-client init run
@@ -102,8 +117,14 @@ socket.on('connection', function(client){
         // Wait for init and only execute once
         if (message.kind == 'init') {
             this.removeListener('jsonmessage',preInit);
-            this.send(JSON.stringify({'kind':'initResponse','ready':true}));
-            new Artist(client, room.getRoom(message.room_id));
+            room.getRoom(message['room_id'], function(room) {
+                if (room) {
+                    client.send(JSON.stringify({'kind':'initResponse','ready':true}));
+                    new Artist(client, room);
+                } else {
+                    throw Error("Room not found");
+                }
+            });
         }
     });
 });
