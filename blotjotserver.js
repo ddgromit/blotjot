@@ -9,7 +9,7 @@ var room = require('./room');
 
 var app = express.createServer(
     connect.staticProvider(__dirname + "/public")
-); 
+);
 function agentType(agent) {
     var agent = agent.toLowerCase();
     if (agent.indexOf("ipod") >= 0) return "ipod";
@@ -17,7 +17,7 @@ function agentType(agent) {
     if (agent.indexOf("ipad") >= 0) return "ipad";
     return "browser";
 }
-function renderIOS(req,res) {    
+function renderIOS(req,res) {
     var board_type = agentType(req.headers['user-agent']);
     res.render('board-ios.jade', {
         layout: false,
@@ -32,7 +32,7 @@ function renderIOS(req,res) {
 app.get('/', function( req, res) {
     res.redirect('/' + Math.floor(Math.random() * 10000));
 });
-app.get('/:room_id', function(req, res){ 
+app.get('/:room_id', function(req, res){
     var board_type = agentType(req.headers['user-agent']);
     console.log(board_type);
     console.log(req.headers['user-agent']);
@@ -46,18 +46,18 @@ app.get('/:room_id', function(req, res){
     } else {
         renderIOS(req,res);
     }
-}); 
-app.get('/:room_id/ios', function(req, res){ 
+});
+app.get('/:room_id/ios', function(req, res){
     renderIOS(req,res);
-}); 
-app.get('/:room_id/test', function(req, res){ 
+});
+app.get('/:room_id/test', function(req, res){
     res.render('board-test.jade', {
         layout: false,
         locals: {
             'room_id':req.params.room_id
         }
     });
-}); 
+});
 
 app.listen(3000);
 
@@ -65,8 +65,8 @@ app.listen(3000);
 var io = require('socket.io');
 var socket = io.listen(app, {
         'transports':['websocket', 'server-events', 'htmlfile', 'xhr-multipart', 'xhr-polling']
-}); 
-socket.on('connection', function(client){ 
+});
+socket.on('connection', function(client){
     // Converts messages into JSON messages
     client.on('message', function (data) {
         try {
@@ -85,7 +85,11 @@ socket.on('connection', function(client){
             this.send(JSON.stringify({'kind':'initResponse','ready':true}));
             new Artist(client, room.getRoom(message.room_id));
         }
-    }); 
+    });
 });
 
+
+process.on('uncaughtException', function(e) {
+    console.log("UNCAUGHT EXCEPTION\n" + e.stack);
+});
 
