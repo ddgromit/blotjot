@@ -8,7 +8,7 @@ shapeFromJSONObject = function(obj) {
     } else if (obj.type == 'clear') {
         return new Clear(obj.color);
     }
-    
+
     throw Error("Shape obj not recognized: " + obj.type);
 }
 
@@ -26,11 +26,36 @@ Clear.prototype = {
     }
 };
 
-QuadBezier = function(color, width, points) {
+QuadBezier = function(color, width, points, trim) {
     this.color = color;
     this.width = width;
     this.points = points;
     this.type = 'bezier';
+    trim = trim || false;
+
+    if (trim) {
+        console.log('trimming');
+        var newPoints = [];
+        var lastRecordedPoint = null;
+        var lastRecordedIndex = 0;
+        var self = this;
+        $.each(this.points, function(iPoint,point) {
+            // Always record first point and last point
+            if (lastRecordedPoint == null || iPoint == self.points.length - 1) {
+                newPoints.push(point);
+                lastRecordedPoint = point;
+                return;
+            }
+            var distance = Math.sqrt(Math.pow(lastRecordedPoint.left - point.left,2) + Math.pow(lastRecordedPoint.top - point.top,2));
+            if (distance >= 10 || iPoint - lastRecordedIndex >= 5) {
+                newPoints.push(point);
+                lastRecordedPoint = point;
+                lastRecordedIndex = iPoint;
+            }
+        });
+        console.log('trimmed: ' + this.points.length + '>' + newPoints.length);
+        this.points = newPoints;
+    }
 };
 QuadBezier.prototype = {
     'toJSONObject':function() {
@@ -48,15 +73,15 @@ QuadBezier.prototype = {
     },
 };
 
-/* 
+/*
     Represents the canvas whiteboard.
 
     Public methods:
      - onNewShapes(shapes) - Takes the above defined shape objects, not JSON
 
     Public events:
-     - "newLocalShapes" (shapes) - Handler with JSON representation 
-    
+     - "newLocalShapes" (shapes) - Handler with JSON representation
+
 */
 Drawing = function() {
 
@@ -83,10 +108,10 @@ Drawing.prototype = {
 		this.curRot = 0;
 		this.curTransX = 0;
 		this.curTransY = 0;
-		
+
         // Other initialization
-        this.addListeners();  
-        
+        this.addListeners();
+
 		if (hasTouch) {
 			if (window.orientation != 0) {
 				self.setRotated(true,window.orientation);
@@ -94,25 +119,25 @@ Drawing.prototype = {
 				self.setRotated(false);
 			}
 		}
-		
+
 		// Touch State
 		this.twoFingerTouching = false;
 		this.startedTouches = [];
 
 	},
 
-	getRotated:function() { 
-	    return this.rotated; 
+	getRotated:function() {
+	    return this.rotated;
 	},
 	setRotated:function(rotate, angle, extraMargin) {
 		angle = angle || 0;
 		extraMargin = extraMargin || 0;
 		this.$canvas.css('-webkit-transform-origin','left top');
-		
+
 		if (rotate && !this.rotated) {
 			this.canvasOrig.x = this.$canvas.offset().left;
 			this.canvasOrig.y = this.$canvas.offset().top;
-			
+
 			var rad;
 			var transX, transY;
 			if (angle == -90) {
@@ -124,9 +149,9 @@ Drawing.prototype = {
 				transX = -320;
 				transY = 0 - extraMargin;
 			}
-			
+
 			this.$canvas.css('-webkit-transform','rotate(' + rad + 'rad) translate(' + transX + 'px,' + transY + 'px)');
-			
+
 			this.curRot = rad;
 			this.curTransX = transX;
 			this.curTransY = transY;
@@ -143,7 +168,7 @@ Drawing.prototype = {
         console.log('[drawing] Remote shapes: ');
         console.log(shapes);
         var drawingShapes = [];
-        $.each(shapes, function(i,shape) {   
+        $.each(shapes, function(i,shape) {
             drawingShapes.push(shapeFromJSONObject(shape));
         });
         this.onNewShapes(drawingShapes);
@@ -183,18 +208,18 @@ Drawing.prototype = {
 			var mouse = {};
 			mouse.x = event.pageX;
 			mouse.y = event.pageY;
-			
+
 			var t1 = translate(mouse,-1*this.canvasOrig.x,-1*this.canvasOrig.y);
 			var t2 = rotate(t1,-1*this.curRot);
 			var t3 = translate(t2,-1*this.curTransX,-1*this.curTransY);
-			
+
 			return {
 				'left':parseInt(t3.x),
 				'top':parseInt(t3.y)
 			};
-			
+
 		}
-		
+
 		// Normal
         return {
             'left':event.pageX - this.$canvas.offset().left,
@@ -223,7 +248,7 @@ Drawing.prototype = {
         context.moveTo(p1.left,p1.top);
         context.quadraticCurveTo(p2.left,p2.top,p3.left,p3.top)
         context.stroke();
-    
+
     },
     drawQuadBezier:function(quad) {
         if (quad.points.length > 0) {
@@ -247,7 +272,7 @@ Drawing.prototype = {
             }
             context.stroke();
         }
-    
+
     },
 	drawClear:function(clear) {
         var context = this.context;
@@ -256,13 +281,13 @@ Drawing.prototype = {
 	},
     addListeners:function() {
         self = this;
-        // Mouse listeners        
+        // Mouse listeners
         if (!this.hasTouch) {
             var mousemove = function(e) {
                 pos = self.getRelativePos(e);
                 self.onPointMove(pos);
             };
-            
+
             this.$canvas.bind("mousedown",function(e) {
                 self.$canvas.bind("mousemove",mousemove);
                 pos = self.getRelativePos(e);
@@ -271,7 +296,7 @@ Drawing.prototype = {
             this.$canvas.bind("mouseup",function(e) {
                 self.$canvas.unbind("mousemove");
                 self.onPointEnd(null);
-                
+
             });
             this.$canvas.bind("mouseleave",function() {
                 self.$canvas.unbind("mousemove");
@@ -285,11 +310,11 @@ Drawing.prototype = {
                     self.setRotated(false);
                 }
             });
-            
+
             // Touch listeners
             this.$canvas.bind("touchstart",function(e) {
 				var touches = e.originalEvent.touches;
-				
+
 				// Detect swipes
 				if (touches.length == 2 && !self.twoFingerTouching) {
 					self.twoFingerTouching = true;
@@ -299,7 +324,7 @@ Drawing.prototype = {
 					self.twoFingerTouching = false;
 					self.startedTouches = [];
 				}
-				
+
 				// Handle single finger moves
 				if (!self.twoFingerTouching) {
 					var touch = touches[0];
@@ -309,7 +334,7 @@ Drawing.prototype = {
             });
             this.$canvas.bind("touchend",function(event) {
                 self.onPointEnd(null);
-				
+
 				// Detect swipes
 				var e = event.originalEvent;
 				if (self.twoFingerTouching && (e.touches.length == 1 || e.touches.length == 0)) {
@@ -317,10 +342,10 @@ Drawing.prototype = {
 					var endTouchPos = self.getRelativePos(endTouch);
 					if (endTouch.identifier in self.startedTouches) {
 						var startTouchPos = self.startedTouches[endTouch.identifier];
-						
+
 						var dX = endTouchPos.left - startTouchPos.left;
 						var dY = endTouchPos.top - startTouchPos.top;
-						
+
 						self.onSwipe(dX,dY);
 					} else {
 						console.log('start touch not found');
@@ -329,24 +354,24 @@ Drawing.prototype = {
 				}
             });
             this.$canvas.bind("touchmove",function(e) {
-                
+
 				if (!self.twoFingerTouching) {
 					var touch = e.originalEvent.touches[0];
 					var pos = self.getRelativePos(touch);
 					self.onPointMove(pos);
 				}
-                
+
                 // Block scrolling
                 e.originalEvent.preventDefault();
-                
+
             });
         }
     },
     onPointStart:function(pos) {
         this.lastPoint = pos;
         this.pointBuffer = [pos];
-		
-		
+
+
 		// Make sure to write any inprogress beziers every once in a while
 		if (this.writeBezierAnywayTimeout) {
 			this.writeBezierAnywayTimeout = null;
@@ -357,7 +382,7 @@ Drawing.prototype = {
 			}
 			//this.setBezierTimeout();
 		}
-		
+
     },
     onPointMove:function(pos) {
         if (this.drawMode == "point") {
@@ -378,24 +403,24 @@ Drawing.prototype = {
             this.drawQuadBezier(quad);
 
         }
-        
+
         // Keep track of points hit
         this.lastPoint = pos;
     },
     /**
-    *  Called when the mouse is let go, a single touch is lifted, or 
+    *  Called when the mouse is let go, a single touch is lifted, or
     *  the cursor leaves the canvas.
     */
     onPointEnd:function(pos) {
         this.lastPoint = null;
         if (this.drawMode == 'bezier' && this.pointBuffer.length > 0)
         {
-            var quad = new QuadBezier(this.strokeColor,this.shapeWidth, this.pointBuffer);
+            var quad = new QuadBezier(this.strokeColor,this.shapeWidth, this.pointBuffer, trim = true);
             this.drawQuadBezier(quad);
             this._addShapes([quad]);
         }
         this.pointBuffer = [];
-		
+
 		if (this.writeBezierAnywayTimeout) {
 			clearTimeout(this.writeBezierAnywayTimeout);
 			this.writeBezierAnywayTimeout = null;
@@ -436,7 +461,7 @@ Drawing.prototype = {
     setShapeWidth:function(width) {
         var w = parseInt(width);
         if (w > 0) {
-            this.shapeWidth = w;   
+            this.shapeWidth = w;
         }
     },
     getShapeWidth:function() {
@@ -453,20 +478,20 @@ Drawing.prototype = {
             shape_json_objs.push(obj.toJSONObject());
         });
 
-        // Trigger 'newLocalShapes' with just the JSON object 
+        // Trigger 'newLocalShapes' with just the JSON object
         // representations of the shapes
         $(this).triggerHandler("newLocalShapes",[shape_json_objs]);
     }
-    
+
 };
-   
-$(function() {    
+
+$(function() {
     var drawing = new Drawing();
     var client = new SocketClient(ROOM_ID);
-    
+
 
     // Send new received shapes to drawing
-    $(client).bind("newRemoteShapes", function(e, shapes) { 
+    $(client).bind("newRemoteShapes", function(e, shapes) {
         console.log("[socket] New remote shapes:");
         console.log(shapes);
         drawing.onRemoteShapes(shapes);
@@ -476,7 +501,7 @@ $(function() {
         console.log(shapes);
         client.onLocalShapes(shapes);
     });
-    
+
     // Hooks into the events:
     $(client).bind("connecting", function(e) {
         console.log('[socket] Connecting...');
@@ -532,7 +557,7 @@ $(function() {
     $("input[name='clear']").click(function() {
         drawing.clear();
     });
-    
+
     // Width
     $(".width-opt-thin").click(function() {
         drawing.setShapeWidth(1);
@@ -555,3 +580,4 @@ $(function() {
         return false;
     });
 });
+
