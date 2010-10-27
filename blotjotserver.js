@@ -30,7 +30,13 @@ function renderIOS(req,res) {
 
 // HTTP Handlers
 app.get('/', function( req, res) {
-    res.redirect('/' + Math.floor(Math.random() * 10000));
+    res.render('homepage.jade', {
+        layout:false,
+        locals: {
+
+        }
+    })
+    //res.redirect('/' + Math.floor(Math.random() * 10000));
 });
 app.get('/:room_id', function(req, res){
     var board_type = agentType(req.headers['user-agent']);
