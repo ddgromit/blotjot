@@ -7,7 +7,7 @@ html
     script(src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js")
     script(src="/js/json2.js")
     :javascript
-      | ROOM_ID = #{room_id};
+      | ROOM_ID = "#{room_id}";
     script(src="/js/socketclient.js")
     script(src="/js/drawing.js")
     link(href="/css/board-ios.css", rel="stylesheet", type="text/css")
@@ -15,4 +15,4 @@ html
     - var board_width = board_type == 'ipad' ? 766 : 318;
     - var board_height = board_type == 'ipad' ? 944 : 414;
     canvas#whiteboard(width=board_width,height=board_height) Your browser doesn't support canvas.
-    
+

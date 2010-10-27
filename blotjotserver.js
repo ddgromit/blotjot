@@ -38,6 +38,20 @@ app.get('/', function( req, res) {
     })
     //res.redirect('/' + Math.floor(Math.random() * 10000));
 });
+app.get('/create', function( req, res) {
+    // Validate params
+    var type = req.param('type') ? req.param('type').toLowerCase() : null;
+    var room_id = req.param('room_id') ? req.param('room_id').toLowerCase() : null;
+
+    if (type != 'iphone' && type != 'ipad') {
+        throw Error("Type must be iphone or ipad");
+    }
+    if (!room_id || room_id.search(/^[a-zA-Z0-9]+$/) < 0) {
+        throw Error("Room ID must be only letters and numbers");
+    }
+
+    res.redirect('/' + room_id);
+});
 app.get('/:room_id', function(req, res){
     var board_type = agentType(req.headers['user-agent']);
     console.log(board_type);

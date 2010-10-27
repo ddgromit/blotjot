@@ -4,7 +4,7 @@ html
     script(src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js")
     script(src="/js/json2.js")
     :javascript
-      | ROOM_ID = #{room_id};
+      | ROOM_ID = "#{room_id}";
     script(src="/js/socketclient.js")
     script(src="/js/drawing.js")
     link(href="/css/board.css", rel="stylesheet", type="text/css")
@@ -32,11 +32,11 @@ html
             div.width-opt.width-opt-medium medium
             div.width-opt.width-opt-thick thick
         div.tool
-          div.name 
+          div.name
           div.control
             input(type="button",name="clear",value="Clear Pad")
         div.tool
           div.control
             div.clients-connected
       div#fb-root
-      
+
