@@ -9,7 +9,6 @@ Artist = function(client, room) {
     this.client.on('jsonmessage', this._data.bind(this));
     this._connect();
 
-    this.room.addClient(this.client);
     this.room.on("clientsChanged", this._clientsChanged.bind(this));
 };
 Artist.prototype = {
@@ -25,7 +24,8 @@ Artist.prototype = {
             });
             self._newRemoteShapes(null, shapes);
         });
-        this._sendClients();
+        this._sendClients(true);
+        this.room.addClient(this.client);
     },
     '_data': function(data) {
         if (!('kind' in data)) {
@@ -56,10 +56,13 @@ Artist.prototype = {
             });
         }
     },
-    '_sendClients':function(num_clients) {
+    '_sendClients':function(not_yet_added) {
+        var num_clients = this.room.numClients();
+        if (not_yet_added) num_clients++;
+
         this._sendJSON({
             'kind':'clientsChanged',
-            'num_clients':this.room.numClients()
+            'num_clients':num_clients
         });
     },
     '_clientsChanged':function(num_clients) {

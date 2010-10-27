@@ -9,6 +9,7 @@ var mongodb = require("mongodb"),
 // Initialize the DB
 var DB_NAME = 'blotjot-node';
 var SHAPES_COLL_NAME = 'shapes';
+var ROOMS_COLL_NAME = 'rooms';
 var dbclient = new Db(DB_NAME, new Server("127.0.0.1", 27017, {}));
 dbclient.open(function() {});
 
@@ -33,7 +34,7 @@ Room.prototype.storeShapes = function(shapes) {
         'room_id':this.room_id,
         'shapes': shapes
     };
-    
+
     dbclient.collection(SHAPES_COLL_NAME, function(err, collection) {
         collection.insert(doc, function(err, docs) {
             if (err) {
@@ -70,12 +71,12 @@ Room.prototype.numClients = function() {
 };
 Room.prototype.addClient = function(client) {
     var id = client.sessionId;
-    if (!(id in this.clients)) {    
+    if (!(id in this.clients)) {
         this.clients[id] = {};
-        this.emit("clientsChanged", this.numClients());   
+        this.emit("clientsChanged", this.numClients());
         //console.log(sys.inspect(client));
     }
-    
+
     var self = this;
     client.on('disconnect', function() {
         delete self.clients[id];
@@ -93,8 +94,9 @@ var getRoom = function(room_id) {
     if (!(room_id in rooms)) {
         rooms[room_id] = new Room(room_id);
         console.log('Made a new room : ' + room_id);
-    } 
-    
+    }
+
     return rooms[room_id];
 };
 exports.getRoom = getRoom;
+
