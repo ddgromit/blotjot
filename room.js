@@ -15,8 +15,9 @@ dbclient.open(function() {});
 
 
 // A room
-Room = function(room_id) {
+Room = function(room_id, type) {
     this.room_id = room_id;
+    this.type = type;
     this.clients = {};
     events.EventEmitter.call(this);
     this.on('clientsChanged', function(num) {

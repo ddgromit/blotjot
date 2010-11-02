@@ -8,9 +8,11 @@ html
     script(src="/js/socketclient.js")
     script(src="/js/drawing.js")
     link(href="/css/board.css", rel="stylesheet", type="text/css")
-  body
+  body(class=board_type)
     div.canvas-container
-      canvas#whiteboard(width="318",height="414") Your browser doesn't support canvas.  Please download chrome or firefox.
+      - var board_width = board_type == 'ipad' ? 766 : 318;
+      - var board_height = board_type == 'ipad' ? 944 : 414;
+      canvas#whiteboard(width=board_width,height=board_height) Your browser doesn't support canvas.  Please download chrome or firefox.
       div.toolbox
         div.tool
           div.name Color

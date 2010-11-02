@@ -17,8 +17,7 @@ function agentType(agent) {
     if (agent.indexOf("ipad") >= 0) return "ipad";
     return "browser";
 }
-function renderIOS(req,res) {
-    var board_type = agentType(req.headers['user-agent']);
+function renderIOS(req,res, board_type) {
     res.render('board-ios.jade', {
         layout: false,
         locals: {
@@ -63,18 +62,18 @@ app.get('/create', function( req, res) {
 app.get('/:room_id', function(req, res){
     room.getRoom(req.params.room_id, function(room) {
         if (room) {
-            var board_type = agentType(req.headers['user-agent']);
-            console.log(board_type);
-            console.log(req.headers['user-agent']);
-            if (board_type == 'browser') {
+            var ua_type = agentType(req.headers['user-agent']);
+            console.log(ua_type);
+            if (ua_type == 'browser') {
                 res.render('board-browser.jade', {
                     layout: false,
                     locals: {
-                        'room_id':req.params.room_id
+                        'room_id':req.params.room_id,
+                        'board_type':room.type
                     }
                 });
             } else {
-                renderIOS(req,res);
+                renderIOS(req,res, room.type);
             }
         } else {
             res.send("Room not found",404);
