@@ -539,15 +539,17 @@ $(function() {
 
 
     // Swatches
-    swatch_colors = ['#FF4848','#3923D6','#9A03FE','#fff','#23819C','#1FCB4A','#DFDF00','#000'];
+    swatch_colors = ['#FF4848','#3923D6','#9A03FE','#F7941D','#23819C','#1FCB4A','#DFDF00','#000'];
     var selectedIndex = Math.floor(Math.random()*swatch_colors.length)
+    var selectedColor = swatch_colors[selectedIndex];
+    if (selectedColor != '#fff') {
+        setStrokeColor(selectedColor);
+    }
+
     $(".swatch").each(function(i,elem) {
         var color = swatch_colors[i];
         $(elem).data('color',color);
         $(elem).css('background-color',color);
-        if (i == selectedIndex && color != '#fff') {
-            setStrokeColor(color);
-        }
     });
     $(".swatch").click(function() {
         setStrokeColor($(this).data('color'));
