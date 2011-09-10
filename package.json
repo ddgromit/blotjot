@@ -1,0 +1,21 @@
+{
+    "name": "blotjot"
+  , "version": "1.0.0"
+  , "description": "A collaborative whiteboard that works on mobile."
+  , "homepage": "http://blotjot.com"
+  , "author": "Derek Dahmer <derekdahmer@gmail.com>"
+  , "repository":{
+        "type": "git"
+      , "url": "https://github.com/ddgromit/blotjot.git"
+    }
+  , "dependencies": {
+        "connect": "1.7.0",
+        "express": "2.4.6",
+        "jade": "0.15.4",
+        "mongodb": "0.9.6-14",
+        "socket.io": "0.8.4",
+        "underscore": "1.1.7"
+    }
+}
+  
+
