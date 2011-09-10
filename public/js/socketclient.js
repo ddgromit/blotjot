@@ -34,6 +34,7 @@ SocketClient.prototype = {
         // Init the room on connect
         var self = this;
         this.socket.on('connect', function() {
+            console.log("Connected using transport " + self.socket.socket.transport.name);
             self._send({
                'kind':'init',
                'room_id':self.room_id
