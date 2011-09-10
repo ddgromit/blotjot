@@ -6,7 +6,7 @@ Artist = function(client, room) {
     this.room = room;
 
     this.room.on("newShapes", this._newRemoteShapes.bind(this));
-    this.client.on('jsonmessage', this._data.bind(this));
+    this.client.on('message', this._data.bind(this));
     this._connect();
 
     this.room.on("clientsChanged", this._clientsChanged.bind(this));
@@ -27,7 +27,14 @@ Artist.prototype = {
         this._sendClients(true);
         this.room.addClient(this.client);
     },
-    '_data': function(data) {
+    '_data': function(json_str) {
+        try {
+            var data = JSON.parse(json_str);
+        } catch (e) {
+            console.log("Couldn't parse JSON message: " + data + e);
+            return;
+        }
+
         if (!('kind' in data)) {
             console.log('Received data without kind: ' + data_str);
             return;
@@ -72,7 +79,7 @@ Artist.prototype = {
         });
     },
     '_sendJSON':function(obj) {
-        this.client.send(JSON.stringify(obj));
+        this.client.emit("message",JSON.stringify(obj));
         return this;
     }
 

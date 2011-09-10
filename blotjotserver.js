@@ -7,9 +7,9 @@ var connect = require('connect');
 var Artist = require('./artist').Artist;
 var room = require('./room');
 
-var app = express.createServer(
-    connect.staticProvider(__dirname + "/public")
-);
+var app = express.createServer();
+app.use(express.static(__dirname + '/public'));
+
 function agentType(agent) {
     var agent = agent.toLowerCase();
     if (agent.indexOf("ipod") >= 0) return "ipod";
@@ -95,30 +95,25 @@ app.get('/:room_id/test', function(req, res){
 app.listen(3000);
 
 // Socket.IO API Handlers
-var io = require('socket.io');
-var socket = io.listen(app, {
+var sio = require('socket.io');
+var io = sio.listen(app, {
         'transports':['websocket', 'server-events', 'htmlfile', 'xhr-multipart', 'xhr-polling']
 });
-socket.on('connection', function(client){
+io.sockets.on('connection', function(client){
     // Converts messages into JSON messages
     client.on('message', function (data) {
         try {
-            var data_obj = JSON.parse(data);
+            var message = JSON.parse(data);
         } catch (e) {
             console.log("Couldn't parse JSON message: " + data + e);
             return;
         }
-        this.emit("jsonmessage", data_obj);
-    });
 
-    // One-time-per-client init run
-    client.on('jsonmessage', function preInit(message) {
         // Wait for init and only execute once
         if (message.kind == 'init') {
-            this.removeListener('jsonmessage',preInit);
             room.getRoom(message['room_id'], function(room) {
                 if (room) {
-                    client.send(JSON.stringify({'kind':'initResponse','ready':true}));
+                    client.emit("message",JSON.stringify({'kind':'initResponse','ready':true}));
                     new Artist(client, room);
                 } else {
                     throw Error("Room not found");

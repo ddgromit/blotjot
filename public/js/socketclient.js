@@ -20,37 +20,37 @@ if (!console) {
 */
 SocketClient = function(room_id) {
     this.room_id = room_id;
-    var self = this;
     // Socket without flash
 
-	this.socket = new io.Socket(location.hostname, {
-        'transports':['websocket', 'server-events', 'htmlfile', 'xhr-multipart', 'xhr-polling']
-    });
-
-	// Init the room on connect
-	this.socket.on('connect', function() {
-	    self._send({
-	       'kind':'init',
-	       'room_id':self.room_id
-	    });
-	});
-
-	// Parse JSON messages
-    this.socket.on("message", function(data_str) {
-        try {
-            var parsed = $.parseJSON(data_str);
-        } catch (e) {
-            console.log("Couldn't JSON parse message: " + data_str);
-            return;
-        }
-        self._onMessage(parsed);
-    });
+	//this.socket = new io.Socket(location.hostname, {
+    //    'transports':['websocket', 'server-events', 'htmlfile', 'xhr-multipart', 'xhr-polling']
+    //});
 
 };
 SocketClient.prototype = {
     'init':function() {
+        this.socket = io.connect();
+
+        // Init the room on connect
+        var self = this;
+        this.socket.on('connect', function() {
+            self._send({
+               'kind':'init',
+               'room_id':self.room_id
+            });
+        });
+
+        // Parse JSON messages
+        this.socket.on("message", function(data_str) {
+            try {
+                var parsed = $.parseJSON(data_str);
+            } catch (e) {
+                console.log("Couldn't JSON parse message: " + data_str);
+                return;
+            }
+            self._onMessage(parsed);
+        });
         $(this).triggerHandler("connecting");
-	    this.socket.connect();
     },
     /* Passed the incoming data as a JSON object */
     '_onMessage':function(message) {
@@ -87,7 +87,7 @@ SocketClient.prototype = {
         });
     },
     '_send':function(obj) {
-        this.socket.send(JSON.stringify(obj));
+        this.socket.emit('message',JSON.stringify(obj));
     }
 };
 
